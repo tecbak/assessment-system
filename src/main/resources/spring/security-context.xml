@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<b:beans xmlns:b="http://www.springframework.org/schema/beans"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://www.springframework.org/schema/security" xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+         xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd">
+
+    <http auto-config="true" use-expressions="true">
+        <!--<intercept-url pattern="/login**" access="permitAll"/>-->
+        <!--<intercept-url pattern="/admin/**" access="hasRole('ROLE_ADMIN')"/>-->
+        <!--<intercept-url pattern="/**" access="hasRole('USER')"/>-->
+        <form-login
+                login-page="/login"
+                login-processing-url="/security_check"
+                default-target-url="/"
+                authentication-failure-url="/login?error"
+                username-parameter="username"
+                password-parameter="password"
+        />
+        <logout logout-success-url="/login?logout" logout-url="/logout"/>
+        <csrf/>
+    </http>
+
+    <authentication-manager>
+        <authentication-provider>
+            <!--<user-service>-->
+            <!--<user name="user" password="password" authorities="ROLE_USER"/>-->
+            <!--</user-service>-->
+            <jdbc-user-service
+                    id="userService"
+                    data-source-ref="dataSource"
+                    users-by-username-query=
+                            "SELECT username, password, TRUE
+                             FROM users
+                             WHERE username = ?"
+                    authorities-by-username-query=
+                            "SELECT username, authority
+                             FROM users
+                             WHERE username = ?"
+            />
+        </authentication-provider>
+    </authentication-manager>
+
+</b:beans>
